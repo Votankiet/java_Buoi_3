@@ -2,35 +2,39 @@ package bai1;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Order {
     private int orderID;
     private LocalDate orderDate;
-    private List<OrderDetail> lineItems;
-
-    
-    public Order() {
-        lineItems = new ArrayList<>();
-    }
-
-   
+    private ArrayList<OrderDetail> lineItems;
     public Order(int orderID, LocalDate orderDate) {
         this.orderID = orderID;
         this.orderDate = orderDate;
-        lineItems = new ArrayList<>();
+        this.lineItems = new ArrayList<OrderDetail>();
     }
 
-    
+    public void addLineItem(Product product, int quantity) {
+        OrderDetail lineItem = new OrderDetail(product, quantity);
+        this.lineItems.add(lineItem);
+    }
+
+    public double calcTotalCharge() {
+        double totalCharge = 0;
+        for (OrderDetail lineItem : this.lineItems) {
+            totalCharge += lineItem.calcTotalPrice();
+        }
+        return totalCharge;
+    }
+
+    @Override
+    public String toString() {
+        return "Order [orderID=" + orderID + ", orderDate=" + orderDate + ", lineItems=" + lineItems + "]";
+    }
+
     public int getOrderID() {
         return orderID;
     }
 
-    public void setOrderID(int orderID) {
-        this.orderID = orderID;
-    }
-
-    
     public LocalDate getOrderDate() {
         return orderDate;
     }
@@ -39,28 +43,8 @@ public class Order {
         this.orderDate = orderDate;
     }
 
-    public List<OrderDetail> getLineItems() {
+    public ArrayList<OrderDetail> getLineItems() {
         return lineItems;
     }
-    
-    public void addLineItems(Product product, int quantity) {
-        lineItems.add(new OrderDetail(quantity, product));
-    }
-
-    public double calcTotalCharge(int n) {
-        double totalCharge = 0;
-        int count = 0;
-        for (int i = n; count < lineItems.size(); i++) {
-            OrderDetail orderDetail = lineItems.get(count);
-            totalCharge += orderDetail.calcTotalPrice();
-            count++;
-        }
-        return totalCharge;
-    }
-
-	@Override
-	public String toString() {
-		return "Order [orderID=" + orderID + ", orderDate=" + orderDate + ", lineItems=" + lineItems + "]";
-	}
 }
-    
+
