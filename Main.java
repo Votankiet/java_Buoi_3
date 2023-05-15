@@ -1,70 +1,71 @@
-package bai1;
+package BAI2;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.time.LocalTime;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        QuanLyHangHoa manager = new QuanLyHangHoa();
 
-        
-        System.out.print("Mã HD: ");
-        int orderID = scanner.nextInt();
-        scanner.nextLine(); 
+        boolean continueAdding = true;
+        while (continueAdding) {
+            System.out.println("Thêm sản phẩm mới");
+            System.out.print("Nhập mã hàng: ");
+            String maHang = scanner.next();
+            System.out.print("Nhập tên hàng: ");
+            String tenHang = scanner.next();
+            System.out.print("Nhập số lượng tồn: ");
+            int soLuongTon = scanner.nextInt();
+            System.out.print("Nhập đơn giá: ");
+            double donGia = scanner.nextDouble();
 
-        System.out.print("Ngày Lập Hóa Đơn (dd-mm-yyyy): ");
-        String orderDateString = scanner.nextLine();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        LocalDate orderDate = LocalDate.parse(orderDateString, formatter);
+            System.out.print("Loại hàng (1 - Hàng điện máy, 2 - Hàng thực phẩm, 3 - Hàng sành sứ): ");
+            int loaiHang = scanner.nextInt();
 
-        
-        Order order = new Order(orderID, orderDate);
+            HangHoa hangHoa;
+            if (loaiHang == 1) {
+                System.out.print("Nhập thời gian bảo hành (tháng): ");
+                int thoiGianBaoHanh = scanner.nextInt();
+                System.out.print("Nhập công suất (KW): ");
+                double congSuat = scanner.nextDouble();
 
-        System.out.print("Số Lượng Sản Phẩm Muốn Xuất HD: ");
-        int numOfProducts = scanner.nextInt();
-        scanner.nextLine(); 
+                hangHoa = new HangDienMay(maHang, tenHang, soLuongTon, donGia, thoiGianBaoHanh, congSuat);
+            } else if (loaiHang == 2) {
+                System.out.print("Nhập ngày sản xuất (d/M/yyyy): ");
+                String ngaySanXuatStr = scanner.next();
+                LocalTime ngaySanXuat = LocalTime.parse(ngaySanXuatStr);
+                System.out.print("Nhập ngày hết hạn (d/M/yyyy): ");
+                String ngayHetHanStr = scanner.next();
+                LocalTime ngayHetHan = LocalTime.parse(ngayHetHanStr);
+                System.out.print("Nhập nhà cung cấp: ");
+                String nhaCungCap = scanner.next();
 
-        
-        for (int i = 0; i < numOfProducts; i++) {
-            System.out.println("Sản Phẩm " + (i + 1));
-            System.out.print("Mã Sản Phẩm: ");
-            String productID = scanner.nextLine();
+                hangHoa = new HangThucPham(maHang, tenHang, soLuongTon, donGia, nhaCungCap, LocalDate.parse(ngayHetHanStr), LocalDate.parse(ngaySanXuatStr));
 
-            System.out.print("Mô Tả: ");
-            String description = scanner.nextLine();
+            } else if (loaiHang == 3) {
+                System.out.print("Nhập nhà sản xuất: ");
+                String nhaSanXuat = scanner.next();
+                System.out.print("Nhập ngày nhập kho (d/M/yyyy): ");
+                String ngayNhapKhoStr = scanner.next();
 
-            System.out.print("Đơn Giá: ");
-            double price = scanner.nextDouble();
+                hangHoa = new HangSanhSu(maHang, tenHang, soLuongTon, donGia, nhaSanXuat, LocalDate.parse(ngayNhapKhoStr));
 
-            System.out.print("Số Lượng: ");
-            int quantity = scanner.nextInt();
-            scanner.nextLine(); 
+            } else {
+                System.out.println("Loại hàng không hợp lệ.");
+                continue;
+            }
 
-            Product product = new Product(productID, description, price);
-            order.addLineItem(product, quantity);
+            manager.addHangHoa(hangHoa);
+
+            System.out.print("Tiếp tục thêm hàng hóa? (y/n): ");
+            String choice = scanner.next();
+            continueAdding = choice.equalsIgnoreCase("y");
         }
 
-        double totalCharge = order.calcTotalCharge();
 
-        
-        System.out.println("HÓA ĐƠN");
-        System.out.println("Mã HD: " + order.getOrderID());
-        System.out.println("Ngày lập hóa đơn: " + order.getOrderDate());
-        System.out.println("Tổng tiền thanh toán: " + totalCharge + " VND");
-        System.out.println("STT  |  Mã SP | Mô tả | Đơn giá  |Số lượng  |Thành tiền");
-
-        ArrayList<OrderDetail> lineItems = order.getLineItems();
-        for (int i = 0; i < lineItems.size(); i++) {
-            OrderDetail lineItem = lineItems.get(i);
-            Product product = lineItem.getProduct();
-            int quantity = lineItem.getQuantity();
-            double totalPrice = lineItem.calcTotalPrice();
-            System.out.printf("%-4s | %-6s | %-20s | %-7s | %-8s | %-10s\n",
-                    (i + 1), product.getProductID(), product.getDescription(),
-                    product.getPrice(), quantity, totalPrice);
-        }
-        scanner.close();
+        System.out.println("\nDanh sách hàng hóa:");
+        manager.printHangHoaList();
     }
 }
